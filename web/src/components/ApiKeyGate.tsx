@@ -65,8 +65,13 @@ export default function ApiKeyGate({ onValidated, children }: ApiKeyGateProps) {
 
   if (checkingStored) {
     return (
-      <div className="page-center">
-        <div className="loading-indicator">Checking stored API key...</div>
+      <div className="min-h-screen bg-background p-4">
+        <div className="flex min-h-[calc(100vh-2rem)] items-center justify-center">
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-background-secondary px-4 py-3 text-sm text-foreground-muted">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-foreground-muted border-t-transparent" />
+            Checking stored API key...
+          </div>
+        </div>
       </div>
     );
   }
@@ -76,35 +81,70 @@ export default function ApiKeyGate({ onValidated, children }: ApiKeyGateProps) {
   }
 
   return (
-    <div className="page-center">
-      <div className="gate-card">
-        <p className="eyebrow">LlamaIndex</p>
-        <h1>Twitter Chart Parser</h1>
-        <p className="subtitle">
-          Enter your LlamaCloud API key to parse tweet charts into clean markdown tables.
-        </p>
+    <div className="min-h-screen bg-background p-4">
+      <div className="mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-md items-center">
+        <div className="w-full">
+          <div className="mb-8 text-center">
+            <img
+              src="/llamaindex-logo.png"
+              alt="LlamaIndex"
+              className="mx-auto mb-4 h-16 w-16 rounded-xl"
+            />
+            <h1 className="text-2xl font-bold text-foreground">Twitter Chart Parser</h1>
+            <p className="mt-2 text-sm text-foreground-muted">
+              Parse tweet chart images into clean markdown and table output.
+            </p>
+          </div>
 
-        <form onSubmit={handleSubmit} className="gate-form">
-          <label htmlFor="apiKey">LlamaCloud API key</label>
-          <input
-            id="apiKey"
-            type="password"
-            placeholder="llx-..."
-            value={apiKey}
-            onChange={(event) => setApiKey(event.target.value)}
-            disabled={loading}
-          />
+          <div className="rounded-xl border border-border bg-background-secondary p-6">
+            <h2 className="mb-2 text-lg font-semibold text-foreground">Enter Your API Key</h2>
+            <p className="mb-6 text-sm text-foreground-muted">
+              Your key is stored locally in this browser and used for validation and parsing requests.
+            </p>
 
-          {error ? <p className="error-text">{error}</p> : null}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="apiKey" className="mb-2 block text-sm font-medium text-foreground-secondary">
+                  LlamaCloud API key
+                </label>
+                <input
+                  id="apiKey"
+                  type="password"
+                  placeholder="llx-..."
+                  value={apiKey}
+                  onChange={(event) => setApiKey(event.target.value)}
+                  disabled={loading}
+                  className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-foreground-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-60"
+                />
+              </div>
 
-          <button type="submit" disabled={loading || !apiKey.trim()}>
-            {loading ? "Validating..." : "Continue"}
-          </button>
-        </form>
+              {error ? (
+                <div className="rounded-lg border border-error/20 bg-error/10 px-3 py-2 text-sm text-error">
+                  {error}
+                </div>
+              ) : null}
 
-        <p className="footnote">
-          Key is stored only in your browser local storage and sent to your backend for validation/parsing.
-        </p>
+              <button
+                type="submit"
+                disabled={loading || !apiKey.trim()}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 font-medium text-white transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {loading ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    Validating...
+                  </>
+                ) : (
+                  "Continue"
+                )}
+              </button>
+            </form>
+          </div>
+
+          <p className="mt-6 text-center text-xs text-foreground-muted">
+            Built by LlamaIndex
+          </p>
+        </div>
       </div>
     </div>
   );
