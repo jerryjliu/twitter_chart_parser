@@ -20,19 +20,29 @@ export default function CombinedMarkdown({ markdown }: CombinedMarkdownProps) {
   };
 
   return (
-    <section className="result-block">
-      <div className="result-header">
-        <h2>Combined Markdown</h2>
-        <div className="result-actions">
-          <button type="button" onClick={handleCopy}>
+    <section className="rounded-xl border border-border bg-background-secondary p-4">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold text-foreground">Combined Markdown</h2>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground-secondary transition-colors hover:bg-background-tertiary"
+          >
             Copy
           </button>
-          <button type="button" onClick={handleDownload}>
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+          >
             Download
           </button>
         </div>
       </div>
-      <pre>{markdown || "No markdown output generated yet."}</pre>
+      <pre className="max-h-[28rem] overflow-auto whitespace-pre-wrap rounded-lg border border-border bg-background p-3 font-mono text-sm text-foreground-secondary">
+        {markdown || "No markdown output generated yet."}
+      </pre>
     </section>
   );
 }
