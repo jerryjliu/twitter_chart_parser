@@ -3,15 +3,15 @@
 import { useState } from "react";
 
 import ApiKeyGate, { clearStoredApiKey } from "@/components/ApiKeyGate";
-import CombinedMarkdown from "@/components/CombinedMarkdown";
 import ParseResults from "@/components/ParseResults";
 import TweetParseForm from "@/components/TweetParseForm";
 import { parseTweet } from "@/lib/api";
-import type { ParseTweetRequest, ParseTweetResponse } from "@/types";
+import type { OutputViewMode, ParseTweetRequest, ParseTweetResponse } from "@/types";
 
 export default function HomePage() {
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [result, setResult] = useState<ParseTweetResponse | null>(null);
+  const [outputMode, setOutputMode] = useState<OutputViewMode>("rendered");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,6 +44,14 @@ export default function HomePage() {
                 </h1>
                 <p className="mt-1 text-sm text-foreground-muted">
                   Convert tweet chart images into clean markdown and structured table blocks.
+                </p>
+                <p className="mt-2 max-w-2xl text-sm text-foreground-muted">
+                  Paste an X/Twitter post URL and the app will pull attached images, parse chart-heavy screenshots,
+                  and return original per-image markdown/HTML alongside segmented table extractions you can use in
+                  docs, notes, or analysis workflows.
+                </p>
+                <p className="mt-2 text-xs text-foreground-muted">
+                  Built for chart threads, earnings graphics, market snapshots, and other data-dense tweet images.
                 </p>
               </div>
             </div>
@@ -78,8 +86,11 @@ export default function HomePage() {
 
           {result ? (
             <div className="grid gap-4">
-              <CombinedMarkdown markdown={result.combined_markdown} />
-              <ParseResults response={result} />
+              <ParseResults
+                response={result}
+                outputMode={outputMode}
+                onOutputModeChange={setOutputMode}
+              />
             </div>
           ) : null}
         </div>
