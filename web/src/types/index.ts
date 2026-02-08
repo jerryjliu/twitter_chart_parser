@@ -1,4 +1,4 @@
-export type ParseTier = "fast" | "cost_effective" | "agentic" | "agentic_plus";
+export type ParseTier = "agentic" | "agentic_plus";
 
 export type MediaExtractionSource = "x_api" | "syndication" | "fxtwitter_api" | "html_meta";
 

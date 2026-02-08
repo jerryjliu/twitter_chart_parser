@@ -45,6 +45,14 @@ export default function HomePage() {
                 <p className="mt-1 text-sm text-foreground-muted">
                   Convert tweet chart images into clean markdown and structured table blocks.
                 </p>
+                <p className="mt-2 max-w-2xl text-sm text-foreground-muted">
+                  Paste an X/Twitter post URL and the app will pull attached images, parse chart-heavy screenshots,
+                  and return both per-image markdown plus a combined output you can drop into docs, notes, or
+                  analysis workflows.
+                </p>
+                <p className="mt-2 text-xs text-foreground-muted">
+                  Built for chart threads, earnings graphics, market snapshots, and other data-dense tweet images.
+                </p>
               </div>
             </div>
             <div className="flex items-center justify-end">

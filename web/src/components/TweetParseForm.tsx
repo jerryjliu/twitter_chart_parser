@@ -10,13 +10,15 @@ interface TweetParseFormProps {
   onSubmit: (payload: ParseTweetRequest) => Promise<void>;
 }
 
-const TIERS: ParseTier[] = ["fast", "cost_effective", "agentic", "agentic_plus"];
+const TIERS: Array<{ value: ParseTier; label: string }> = [
+  { value: "agentic", label: "Agentic (recommended)" },
+  { value: "agentic_plus", label: "Agentic Plus (higher quality, slower)" },
+];
 
 export default function TweetParseForm({ apiKey, loading, onSubmit }: TweetParseFormProps) {
   const [tweetUrl, setTweetUrl] = useState("");
   const [xBearerToken, setXBearerToken] = useState("");
   const [tier, setTier] = useState<ParseTier>("agentic");
-  const [enableChartParsing, setEnableChartParsing] = useState(true);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -24,7 +26,7 @@ export default function TweetParseForm({ apiKey, loading, onSubmit }: TweetParse
       api_key: apiKey,
       tweet_url: tweetUrl.trim(),
       tier,
-      enable_chart_parsing: enableChartParsing,
+      enable_chart_parsing: true,
       x_bearer_token: xBearerToken.trim() || undefined,
     });
   };
@@ -50,60 +52,48 @@ export default function TweetParseForm({ apiKey, loading, onSubmit }: TweetParse
         />
       </div>
 
-      <div>
-        <label htmlFor="x-token" className="mb-2 block text-sm font-medium text-foreground-secondary">
-          X bearer token (optional)
-        </label>
-        <input
-          id="x-token"
-          type="password"
-          value={xBearerToken}
-          placeholder="Improves media extraction reliability"
-          onChange={(event) => setXBearerToken(event.target.value)}
-          disabled={loading}
-          className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-foreground-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-60"
-        />
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="tier" className="mb-2 block text-sm font-medium text-foreground-secondary">
-            Parse tier
-          </label>
-          <select
-            id="tier"
-            value={tier}
-            onChange={(event) => setTier(event.target.value as ParseTier)}
-            disabled={loading}
-            className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-60"
-          >
-            {TIERS.map((candidate) => (
-              <option value={candidate} key={candidate}>
-                {candidate}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="rounded-lg border border-border bg-background px-4 py-3">
-          <label htmlFor="chart-parsing" className="flex cursor-pointer items-start gap-3">
-            <input
-              id="chart-parsing"
-              type="checkbox"
-              checked={enableChartParsing}
-              onChange={(event) => setEnableChartParsing(event.target.checked)}
+      <details className="rounded-lg border border-border bg-background px-4 py-3">
+        <summary className="cursor-pointer text-sm font-medium text-foreground-secondary">
+          Advanced settings
+        </summary>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="tier" className="mb-2 block text-sm font-medium text-foreground-secondary">
+              Parse tier
+            </label>
+            <select
+              id="tier"
+              value={tier}
+              onChange={(event) => setTier(event.target.value as ParseTier)}
               disabled={loading}
-              className="mt-1 h-4 w-4 rounded border-border text-accent focus:ring-accent/30"
+              className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-60"
+            >
+              {TIERS.map((candidate) => (
+                <option value={candidate.value} key={candidate.value}>
+                  {candidate.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="x-token" className="mb-2 block text-sm font-medium text-foreground-secondary">
+              X bearer token (optional)
+            </label>
+            <input
+              id="x-token"
+              type="password"
+              value={xBearerToken}
+              placeholder="Improves media extraction reliability"
+              onChange={(event) => setXBearerToken(event.target.value)}
+              disabled={loading}
+              className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-foreground-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-60"
             />
-            <span>
-              <span className="block text-sm font-medium text-foreground-secondary">
-                Enable specialized chart parsing
-              </span>
-              <span className="block text-xs text-foreground-muted">Improves extraction on chart-heavy images.</span>
-            </span>
-          </label>
+          </div>
         </div>
-      </div>
+        <p className="mt-3 text-xs text-foreground-muted">
+          Specialized chart parsing is always enabled to improve chart-heavy extraction.
+        </p>
+      </details>
 
       <button
         type="submit"
