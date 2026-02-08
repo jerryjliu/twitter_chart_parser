@@ -1,12 +1,53 @@
 "use client";
 
-import type { ParseTweetResponse } from "@/types";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
+import remarkGfm from "remark-gfm";
+
+import type { OutputViewMode, ParseTweetResponse } from "@/types";
 
 interface ParseResultsProps {
   response: ParseTweetResponse;
+  outputMode: OutputViewMode;
+  onOutputModeChange: (mode: OutputViewMode) => void;
 }
 
-export default function ParseResults({ response }: ParseResultsProps) {
+interface OutputModeToggleProps {
+  outputMode: OutputViewMode;
+  onOutputModeChange: (mode: OutputViewMode) => void;
+}
+
+function OutputModeToggle({ outputMode, onOutputModeChange }: OutputModeToggleProps) {
+  return (
+    <div className="inline-flex rounded-lg border border-border bg-background p-0.5">
+      <button
+        type="button"
+        onClick={() => onOutputModeChange("rendered")}
+        className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+          outputMode === "rendered" ? "bg-accent text-white" : "text-foreground-secondary hover:bg-background-tertiary"
+        }`}
+      >
+        Rendered
+      </button>
+      <button
+        type="button"
+        onClick={() => onOutputModeChange("raw")}
+        className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+          outputMode === "raw" ? "bg-accent text-white" : "text-foreground-secondary hover:bg-background-tertiary"
+        }`}
+      >
+        Raw
+      </button>
+    </div>
+  );
+}
+
+export default function ParseResults({
+  response,
+  outputMode,
+  onOutputModeChange,
+}: ParseResultsProps) {
   const copy = async (text: string) => {
     await navigator.clipboard.writeText(text);
   };
@@ -56,23 +97,43 @@ export default function ParseResults({ response }: ParseResultsProps) {
             <>
               <div className="rounded-lg border border-border bg-background p-3">
                 <div className="mb-2 flex items-center justify-between gap-2">
-                  <h4 className="text-sm font-semibold text-foreground">Markdown</h4>
-                  <button
-                    type="button"
-                    onClick={() => copy(result.markdown)}
-                    className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground-secondary transition-colors hover:bg-background-tertiary"
-                  >
-                    Copy
-                  </button>
+                  <h4 className="text-sm font-semibold text-foreground">Original Markdown / HTML</h4>
+                  <div className="flex items-center gap-2">
+                    <OutputModeToggle outputMode={outputMode} onOutputModeChange={onOutputModeChange} />
+                    <button
+                      type="button"
+                      onClick={() => copy(result.markdown)}
+                      className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground-secondary transition-colors hover:bg-background-tertiary"
+                    >
+                      Copy
+                    </button>
+                  </div>
                 </div>
-                <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-lg border border-border bg-background-secondary p-3 font-mono text-sm text-foreground-secondary">
-                  {result.markdown || "No markdown content."}
-                </pre>
+                {!result.markdown ? (
+                  <div className="rounded-lg border border-border bg-background-secondary p-3 text-sm text-foreground-muted">
+                    No markdown content.
+                  </div>
+                ) : outputMode === "raw" ? (
+                  <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-lg border border-border bg-background-secondary p-3 font-mono text-sm text-foreground-secondary">
+                    {result.markdown}
+                  </pre>
+                ) : (
+                  <div className="max-h-72 overflow-auto rounded-lg border border-border bg-background-secondary p-3">
+                    <div className="markdown-rendered text-sm text-foreground-secondary">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeSanitize]}>
+                        {result.markdown}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="rounded-lg border border-border bg-background p-3">
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <h4 className="text-sm font-semibold text-foreground">Tables ({result.tables.length})</h4>
+                  {result.tables.length > 0 ? (
+                    <OutputModeToggle outputMode={outputMode} onOutputModeChange={onOutputModeChange} />
+                  ) : null}
                 </div>
                 {result.tables.length === 0 ? (
                   <p className="text-sm text-foreground-muted">No table structures detected.</p>
@@ -82,9 +143,19 @@ export default function ParseResults({ response }: ParseResultsProps) {
                       <p className="mb-2 text-xs text-foreground-muted">
                         Page {table.page_number}, {table.row_count} row(s), {table.column_count} column(s)
                       </p>
-                      <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg border border-border bg-background-secondary p-3 font-mono text-sm text-foreground-secondary">
-                        {table.markdown}
-                      </pre>
+                      {outputMode === "raw" ? (
+                        <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg border border-border bg-background-secondary p-3 font-mono text-sm text-foreground-secondary">
+                          {table.markdown}
+                        </pre>
+                      ) : (
+                        <div className="max-h-64 overflow-auto rounded-lg border border-border bg-background-secondary p-3">
+                          <div className="markdown-rendered text-sm text-foreground-secondary">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeSanitize]}>
+                              {table.markdown}
+                            </ReactMarkdown>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))
                 )}
