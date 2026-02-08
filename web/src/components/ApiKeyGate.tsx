@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 import { validateLlamaKey } from "@/lib/api";
-
-const STORAGE_KEY = "llama-cloud-api-key";
+import { clearStoredApiKey, getStoredApiKey, setStoredApiKey } from "@/lib/apiKeyStorage";
 
 interface ApiKeyGateProps {
   onValidated: (apiKey: string) => void;
@@ -20,7 +19,7 @@ export default function ApiKeyGate({ onValidated, children }: ApiKeyGateProps) {
   const [checkingStored, setCheckingStored] = useState(true);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
+    const stored = getStoredApiKey();
     if (!stored) {
       setCheckingStored(false);
       return;
@@ -33,7 +32,7 @@ export default function ApiKeyGate({ onValidated, children }: ApiKeyGateProps) {
         onValidated(stored);
       })
       .catch(() => {
-        window.localStorage.removeItem(STORAGE_KEY);
+        clearStoredApiKey();
       })
       .finally(() => {
         setLoading(false);
@@ -53,7 +52,7 @@ export default function ApiKeyGate({ onValidated, children }: ApiKeyGateProps) {
     setLoading(true);
     try {
       await validateLlamaKey(apiKey.trim());
-      window.localStorage.setItem(STORAGE_KEY, apiKey.trim());
+      setStoredApiKey(apiKey.trim());
       onValidated(apiKey.trim());
       setReady(true);
     } catch (submitError) {
@@ -148,11 +147,4 @@ export default function ApiKeyGate({ onValidated, children }: ApiKeyGateProps) {
       </div>
     </div>
   );
-}
-
-export function clearStoredApiKey(): void {
-  if (typeof window === "undefined") {
-    return;
-  }
-  window.localStorage.removeItem(STORAGE_KEY);
 }
