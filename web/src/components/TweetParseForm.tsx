@@ -61,7 +61,19 @@ export default function TweetParseForm({
           className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-foreground-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-60"
         />
         <p className="mt-2 text-xs text-foreground-muted">
-          Your key is stored locally in this browser and used for validation and parsing requests.
+          Your key is stored locally in this browser and used for validation and parse requests billed to your
+          LlamaCloud account.
+        </p>
+        <p className="mt-1 text-xs text-foreground-muted">
+          Don&apos;t have a LlamaCloud account?{" "}
+          <a
+            href="https://cloud.llamaindex.ai/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-accent hover:underline"
+          >
+            Sign up for LlamaCloud
+          </a>
         </p>
       </div>
 
