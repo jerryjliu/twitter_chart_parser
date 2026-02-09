@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 
-import type { ParseTier, ParseTweetRequest } from "@/types";
+import type { ApiKeyValidationStatus, ParseTier, ParseTweetRequest } from "@/types";
 
 interface TweetParseFormProps {
   apiKey: string;
+  onApiKeyChange: (apiKey: string) => void;
+  apiKeyStatus: ApiKeyValidationStatus;
+  apiKeyError: string | null;
   loading: boolean;
-  onSubmit: (payload: ParseTweetRequest) => Promise<void>;
+  onSubmit: (payload: Omit<ParseTweetRequest, "api_key">) => Promise<void>;
 }
 
 const TIERS: Array<{ value: ParseTier; label: string }> = [
@@ -15,15 +18,22 @@ const TIERS: Array<{ value: ParseTier; label: string }> = [
   { value: "agentic_plus", label: "Agentic Plus (higher quality, slower)" },
 ];
 
-export default function TweetParseForm({ apiKey, loading, onSubmit }: TweetParseFormProps) {
+export default function TweetParseForm({
+  apiKey,
+  onApiKeyChange,
+  apiKeyStatus,
+  apiKeyError,
+  loading,
+  onSubmit,
+}: TweetParseFormProps) {
   const [tweetUrl, setTweetUrl] = useState("");
   const [xBearerToken, setXBearerToken] = useState("");
   const [tier, setTier] = useState<ParseTier>("agentic");
+  const disabled = loading || apiKeyStatus === "checking";
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     await onSubmit({
-      api_key: apiKey,
       tweet_url: tweetUrl.trim(),
       tier,
       enable_chart_parsing: true,
@@ -37,6 +47,54 @@ export default function TweetParseForm({ apiKey, loading, onSubmit }: TweetParse
       className="grid gap-4 rounded-xl border border-border bg-background-secondary p-5"
     >
       <div>
+        <label htmlFor="api-key" className="mb-2 block text-sm font-medium text-foreground-secondary">
+          LlamaCloud API key
+        </label>
+        <input
+          id="api-key"
+          type="password"
+          required
+          value={apiKey}
+          placeholder="llx-..."
+          onChange={(event) => onApiKeyChange(event.target.value)}
+          disabled={disabled}
+          className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-foreground-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-60"
+        />
+        <p className="mt-2 text-xs text-foreground-muted">
+          Your key is stored locally in this browser and used for validation and parse requests billed to your
+          LlamaCloud account.
+        </p>
+        <p className="mt-1 text-xs text-foreground-muted">
+          Don&apos;t have a LlamaCloud account?{" "}
+          <a
+            href="https://cloud.llamaindex.ai/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-accent hover:underline"
+          >
+            Sign up for LlamaCloud
+          </a>
+        </p>
+      </div>
+
+      {apiKeyError ? (
+        <div className="rounded-lg border border-error/20 bg-error/10 px-3 py-2 text-sm text-error">
+          {apiKeyError}
+        </div>
+      ) : null}
+
+      {!apiKeyError && apiKeyStatus === "checking" ? (
+        <div className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground-muted">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-foreground-muted border-t-transparent" />
+          Validating API key...
+        </div>
+      ) : null}
+
+      {!apiKeyError && apiKeyStatus === "valid" ? (
+        <p className="text-xs text-success">API key validated.</p>
+      ) : null}
+
+      <div>
         <label htmlFor="tweet-url" className="mb-2 block text-sm font-medium text-foreground-secondary">
           Tweet URL
         </label>
@@ -47,7 +105,7 @@ export default function TweetParseForm({ apiKey, loading, onSubmit }: TweetParse
           value={tweetUrl}
           placeholder="https://x.com/.../status/..."
           onChange={(event) => setTweetUrl(event.target.value)}
-          disabled={loading}
+          disabled={disabled}
           className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-foreground-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-60"
         />
       </div>
@@ -65,7 +123,7 @@ export default function TweetParseForm({ apiKey, loading, onSubmit }: TweetParse
               id="tier"
               value={tier}
               onChange={(event) => setTier(event.target.value as ParseTier)}
-              disabled={loading}
+              disabled={disabled}
               className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-60"
             >
               {TIERS.map((candidate) => (
@@ -85,7 +143,7 @@ export default function TweetParseForm({ apiKey, loading, onSubmit }: TweetParse
               value={xBearerToken}
               placeholder="Improves media extraction reliability"
               onChange={(event) => setXBearerToken(event.target.value)}
-              disabled={loading}
+              disabled={disabled}
               className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-foreground-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-60"
             />
           </div>
@@ -97,7 +155,7 @@ export default function TweetParseForm({ apiKey, loading, onSubmit }: TweetParse
 
       <button
         type="submit"
-        disabled={loading || !tweetUrl.trim()}
+        disabled={disabled || !tweetUrl.trim() || !apiKey.trim()}
         className="flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 font-medium text-white transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Parsing tweet..." : "Parse Tweet"}

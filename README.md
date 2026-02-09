@@ -13,9 +13,9 @@ Convert chart-heavy X/Twitter post images into clean markdown and structured tab
 Built for chart threads, earnings snapshots, macro dashboards, and other data-dense tweet images.
 
 ## Quick Walkthrough
-1. Paste a tweet URL.
+1. Open the app and enter your LlamaCloud API key plus the tweet URL on the same screen.
 2. Click **Parse Tweet**.
-3. Review the per-image markdown and extracted table outputs.
+3. Review the per-image markdown/HTML output and extracted table blocks.
 
 ### Input + Parse Flow
 ![Twitter Chart Parser input and parse flow](docs/images/twitter_chart_parser1.png)
@@ -93,7 +93,7 @@ twitter_chart_parser/
   - Ensure the key starts with `llx-`.
   - Confirm network access to `api.cloud.llamaindex.ai`.
 - Parse request is slow:
-  - Use a lower parse tier (`cost_effective` or `fast`).
+  - Use a lower parse tier (`agentic`).
   - Try posts with fewer attached images.
 
 ## Reliability Notes
