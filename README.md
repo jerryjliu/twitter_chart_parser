@@ -55,6 +55,24 @@ If needed, set the frontend API URL:
 export NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
+## Deployment (Vercel + Render)
+
+This repo is designed to deploy as two services:
+- Frontend (`web/`) on Vercel
+- Backend (`backend/`) on Render
+
+Required environment variables:
+- Backend (Render): `CORS_ORIGINS` (comma-separated frontend origins)
+- Frontend (Vercel): `NEXT_PUBLIC_API_URL` (public backend URL)
+
+Deployment config/templates in this repo:
+- `render.yaml`
+- `backend/.env.example`
+- `web/.env.example`
+
+Detailed runbook:
+- `docs/deployment/vercel-render.md`
+
 ## API Overview
 - `POST /validate-llama-key`: Validate a LlamaCloud API key.
 - `POST /extract-tweet-images`: Extract image URLs from a tweet/post.
