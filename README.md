@@ -1,6 +1,8 @@
 # Twitter Chart Parser
 
-Convert chart-heavy X/Twitter post images into clean markdown and structured tables using LlamaParse.
+Convert chart-heavy X/Twitter post images into clean markdown and structured tables using LlamaParse on LlamaCloud.
+
+> New to LlamaCloud? **[Sign up for LlamaCloud](https://cloud.llamaindex.ai/)** to get an API key (`llx-...`) and run this app.
 
 ## What This App Does
 - Accepts an X/Twitter post URL.
@@ -13,9 +15,10 @@ Convert chart-heavy X/Twitter post images into clean markdown and structured tab
 Built for chart threads, earnings snapshots, macro dashboards, and other data-dense tweet images.
 
 ## Quick Walkthrough
-1. Open the app and enter your LlamaCloud API key plus the tweet URL on the same screen.
-2. Click **Parse Tweet**.
-3. Review the per-image markdown/HTML output and extracted table blocks.
+1. Create a LlamaCloud account if you do not have one yet: **[Sign up here](https://cloud.llamaindex.ai/)**.
+2. Open the app and enter your LlamaCloud API key plus the tweet URL on the same screen.
+3. Click **Parse Tweet**.
+4. Review the per-image markdown/HTML output and extracted table blocks.
 
 ### Input + Parse Flow
 ![Twitter Chart Parser input and parse flow](docs/images/twitter_chart_parser1.png)
@@ -24,6 +27,13 @@ Built for chart threads, earnings snapshots, macro dashboards, and other data-de
 ![Twitter Chart Parser rendered output and table extraction](docs/images/twitter_chart_parser2.png)
 
 ## Getting Started (Local)
+
+### LlamaCloud Account (Required)
+This app requires a LlamaCloud API key for parsing.
+
+1. Sign up at **[cloud.llamaindex.ai](https://cloud.llamaindex.ai/)**.
+2. Create an API key in your LlamaCloud dashboard.
+3. Use that key in the app input (`llx-...`).
 
 ### Prerequisites
 - Python 3.11+
